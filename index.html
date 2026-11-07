@@ -39,10 +39,10 @@ a{color:inherit;text-underline-offset:5px}button,input{font:inherit}a,button,inp
 <section class="rsvp-card reveal" id="rsvp-section"><p class="kicker">שומרים לכם מקום</p><h2>מגיעים?</h2><p class="rsvp-intro">רק כדי שנדע כמה צלחות וכוסות להכין.</p>
 <form id="rsvp"><div class="field" id="name-field"><label for="name">איך קוראים לכם?</label><input type="text" id="name" name="name" autocomplete="name" required maxlength="100" placeholder="השם שלכם" dir="auto"></div>
 <fieldset><legend>בחירת אישור הגעה</legend><div class="opts">
-<label><input type="radio" name="attendance" value="couple" checked required>מגיעים 🥂</label>
-<label><input type="radio" name="attendance" value="alone">מגיע/ה לבד</label>
-<label><input type="radio" name="attendance" value="not_coming">לא נוכל להגיע, לצערנו</label></div></fieldset>
-<label class="sleep"><input type="checkbox" name="sleeping_over" value="yes">נשאר/ת לישון</label>
+<label id="opt-couple"><input type="radio" name="attendance" value="couple" checked required>מגיעים שנינו 🥂</label>
+<label id="opt-alone"><input type="radio" name="attendance" value="alone"><span>רק אחד/ת מאיתנו יגיע</span></label>
+<label><input type="radio" name="attendance" value="not_coming"><span id="no-text">לא נוכל להגיע, לצערנו</span></label></div></fieldset>
+<label class="sleep"><input type="checkbox" name="sleeping_over" value="yes"><span id="sleep-text">נשארים לישון</span></label>
 <button class="btn" type="submit">שליחת תשובה ←</button><p class="form-foot">אפשר לעדכן את אריאל אם התוכניות משתנות.</p>
 <p class="err" role="alert" hidden>השליחה לא הצליחה. נסו שוב בעוד רגע.</p></form>
 <div class="thanks" role="status" tabindex="-1" hidden><h3>התשובה התקבלה!</h3><p id="thanks-message">תודה, מחכים לחגוג יחד.</p></div>
@@ -54,6 +54,8 @@ a{color:inherit;text-underline-offset:5px}button,input{font:inherit}a,button,inp
     const form=document.getElementById('rsvp'),nameInput=document.getElementById('name');
     // Query strings are decoded by URLSearchParams. Names are inserted as text, never HTML.
     const guestName=(new URLSearchParams(location.search).get('name')||'').trim().slice(0,100);
+    if(new URLSearchParams(location.search).get('t')==='1'){const c=document.getElementById('opt-couple');c.remove();const a=document.getElementById('opt-alone');a.querySelector('input').checked=true;a.querySelector('input').required=true;a.querySelector('span').textContent='מגיע/ה 🥂';document.getElementById('no-text').textContent='לא אוכל להגיע, לצערי';document.getElementById('sleep-text').textContent='נשאר/ת לישון';}
+
     if(guestName){const greeting=document.getElementById('guest-greeting');greeting.textContent='שלום '+guestName+',';greeting.hidden=false;document.getElementById('invitation-line').textContent='איזה כיף לחגוג יחד איתך.';nameInput.value=guestName;nameInput.required=false;nameInput.type='hidden';document.getElementById('name-field').hidden=true;}
     if('IntersectionObserver' in window&&!reduceMotion.matches){document.documentElement.classList.add('motion');const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));}
     function sparkle(count){if(reduceMotion.matches)return;for(let i=0;i<count;i++){const s=document.createElement('i');s.className='spark';s.setAttribute('aria-hidden','true');s.style.left=(8+Math.random()*84)+'%';s.style.setProperty('--drift',(Math.random()*100-50)+'px');s.style.background=['#e8a16f','#bad8ca','#f1d8a8'][i%3];s.style.animationDelay=(Math.random()*.5)+'s';document.body.appendChild(s);s.addEventListener('animationend',()=>s.remove(),{once:true});}}
