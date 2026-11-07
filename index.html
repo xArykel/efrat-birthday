@@ -48,34 +48,44 @@ a{color:inherit;text-underline-offset:5px}button,input{font:inherit}a,button,inp
 <p class="err" role="alert" hidden>השליחה לא הצליחה. נסו שוב בעוד רגע.</p></form>
 <div class="thanks" role="status" tabindex="-1" hidden><h3>התשובה התקבלה!</h3><p id="thanks-message">תודה, מחכים לחגוג יחד.</p></div>
 <script>
-    const SB_URL='https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rsvps';
-    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbm5sZWltcXdnbmdsem53eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyODgwNTUsImV4cCI6MjEwMTg2NDA1NX0.6jATYqxEJ3bxMEuHNDLHpbbB0miVti9YfDR566zKOhY';
-
-    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
-    const form=document.getElementById('rsvp'),nameInput=document.getElementById('name');
-    // Query strings are decoded by URLSearchParams. Names are inserted as text, never HTML.
-    const guestName=(new URLSearchParams(location.search).get('name')||'').trim().slice(0,100);
-    if(new URLSearchParams(location.search).get('t')==='1'){const c=document.getElementById('opt-couple');c.remove();const a=document.getElementById('opt-alone');a.querySelector('input').checked=true;a.querySelector('input').required=true;a.querySelector('span').textContent='מגיע/ה 🥂';document.getElementById('no-text').textContent='לא אוכל להגיע, לצערי';document.getElementById('sleep-text').textContent='נשאר/ת לישון';}
-
-    if(guestName){const greeting=document.getElementById('guest-greeting');greeting.textContent='שלום '+guestName+',';greeting.hidden=false;document.getElementById('invitation-line').textContent='חגיגה של פעם בשנה';nameInput.value=guestName;nameInput.required=false;nameInput.type='hidden';document.getElementById('name-field').hidden=true;}
-    if('IntersectionObserver' in window&&!reduceMotion.matches){document.documentElement.classList.add('motion');const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));}
-    function sparkle(count){if(reduceMotion.matches)return;for(let i=0;i<count;i++){const s=document.createElement('i');s.className='spark';s.setAttribute('aria-hidden','true');s.style.left=(8+Math.random()*84)+'%';s.style.setProperty('--drift',(Math.random()*100-50)+'px');s.style.background=['#e8a16f','#bad8ca','#f1d8a8'][i%3];s.style.animationDelay=(Math.random()*.5)+'s';document.body.appendChild(s);s.addEventListener('animationend',()=>s.remove(),{once:true});}}
-    sparkle(12);
-    form.addEventListener('change',()=>{const absent=form.elements.attendance.value==='not_coming';form.elements.sleeping_over.disabled=absent;if(absent)form.elements.sleeping_over.checked=false;});
-    nameInput.addEventListener('input',()=>nameInput.setCustomValidity(''));
-    document.getElementById('rsvp').addEventListener('submit',async e=>{
-      e.preventDefault();const f=e.target,btn=f.querySelector('button'),err=f.querySelector('.err');
-      const d=new FormData(f),name=(guestName||String(d.get('name')||'')).trim();
-      if(!name){nameInput.setCustomValidity('נא למלא שם');nameInput.reportValidity();return;}
-      err.hidden=true;btn.disabled=true;btn.textContent='שולח...';
-      const body={name,attendance:d.get('attendance'),sleeping_over:d.get('sleeping_over')==='yes',note:null};
-      try{const r=await fetch(SB_URL,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
-        if(!r.ok)throw new Error(r.status);
-        f.hidden=true;document.getElementById('thanks-message').textContent=body.attendance==='not_coming'?'תודה שעדכנת, נחגוג יחד בפעם הבאה.':'תודה, מחכים לחגוג יחד!';
-        const thanks=document.querySelector('.thanks');thanks.hidden=false;thanks.focus({preventScroll:true});if(body.attendance!=='not_coming')sparkle(23);
-      }catch(x){err.hidden=false;btn.disabled=false;btn.textContent='שליחת תשובה ←';}
-    });
-    </script></section>
+const RPC='https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rpc/';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbm5sZWltcXdnbmdsem53eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyODgwNTUsImV4cCI6MjEwMTg2NDA1NX0.6jATYqxEJ3bxMEuHNDLHpbbB0miVti9YfDR566zKOhY';
+const H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+const form=document.getElementById('rsvp');
+document.getElementById('name-field').remove();
+const token=(new URLSearchParams(location.search).get('i')||'').trim().toLowerCase();
+const section=document.getElementById('rsvp-section');
+function invalid(){section.querySelector('h2').textContent='הקישור לא תקין';section.querySelector('.rsvp-intro').textContent='נראה שהקישור להזמנה לא שלם. אפשר לפנות לאריאל ב-050-2102773 ונסדר.';form.hidden=true;}
+function sparkle(count){if(reduceMotion.matches)return;for(let i=0;i<count;i++){const s=document.createElement('i');s.className='spark';s.setAttribute('aria-hidden','true');s.style.left=(8+Math.random()*84)+'%';s.style.setProperty('--drift',(Math.random()*100-50)+'px');s.style.background=['#e8a16f','#bad8ca','#f1d8a8'][i%3];s.style.animationDelay=(Math.random()*.5)+'s';document.body.appendChild(s);s.addEventListener('animationend',()=>s.remove(),{once:true});}}
+if('IntersectionObserver' in window&&!reduceMotion.matches){document.documentElement.classList.add('motion');const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}}),{threshold:.08});document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));}
+sparkle(12);
+form.hidden=true;
+form.addEventListener('change',()=>{const absent=form.elements.attendance.value==='not_coming';form.elements.sleeping_over.disabled=absent;if(absent)form.elements.sleeping_over.checked=false;});
+(async()=>{
+  if(!/^[0-9a-f]{32}$/.test(token))return invalid();
+  try{const r=await fetch(RPC+'get_invite',{method:'POST',headers:H,body:JSON.stringify({p_token:token})});const rows=await r.json();if(!r.ok||!rows.length)return invalid();
+    const g=rows[0];
+    const greeting=document.getElementById('guest-greeting');greeting.textContent='שלום '+g.name+',';greeting.hidden=false;document.getElementById('invitation-line').textContent='חגיגה של פעם בשנה';
+    if(g.kind==='single'){document.getElementById('opt-couple').remove();const a=document.getElementById('opt-alone');a.querySelector('input').required=true;a.querySelector('span').textContent='מגיע/ה 🥂';document.getElementById('no-text').textContent='לא אוכל להגיע, לצערי';document.getElementById('sleep-text').textContent='נשאר/ת לישון';}
+    const def=g.attendance||(g.kind==='single'?'alone':'couple');
+    const radio=form.querySelector('input[name=attendance][value="'+def+'"]');if(radio)radio.checked=true;
+    form.elements.sleeping_over.checked=!!g.sleeping_over;form.dispatchEvent(new Event('change'));
+    if(g.attendance){section.querySelector('.rsvp-intro').textContent='כבר קיבלנו ממך תשובה. אפשר לעדכן אותה כאן בכל זמן.';form.querySelector('button').textContent='עדכון תשובה ←';}
+    form.hidden=false;
+  }catch(x){section.querySelector('.rsvp-intro').textContent='לא הצלחנו לטעון את ההזמנה. נסו לרענן את הדף.';}
+})();
+form.addEventListener('submit',async e=>{
+  e.preventDefault();const btn=form.querySelector('button'),err=form.querySelector('.err'),label=btn.textContent;
+  const att=form.elements.attendance.value,sleep=form.elements.sleeping_over.checked&&att!=='not_coming';
+  err.hidden=true;btn.disabled=true;btn.textContent='שולח...';
+  try{const r=await fetch(RPC+'submit_rsvp',{method:'POST',headers:H,body:JSON.stringify({p_token:token,p_attendance:att,p_sleeping_over:sleep})});
+    if(!r.ok)throw new Error(r.status);
+    form.hidden=true;document.getElementById('thanks-message').textContent=att==='not_coming'?'תודה שעדכנת, נחגוג יחד בפעם הבאה.':'תודה, מחכים לחגוג יחד!';
+    const thanks=document.querySelector('.thanks');thanks.hidden=false;thanks.focus({preventScroll:true});if(att!=='not_coming')sparkle(23);
+  }catch(x){err.hidden=false;btn.disabled=false;btn.textContent=label;}
+});
+</script></section>
 <div class="contact reveal"><p>לשאלות ולכל דבר — אריאל כאן</p><div class="contact-links"><a href="tel:+972502102773"><bdi>050-2102773</bdi></a><a href="https://wa.me/972502102773" target="_blank" rel="noopener noreferrer">נדבר בוואטסאפ ↗</a></div></div>
 </main>
 <footer><p>לחיי הרגעים הטובים שלנו.</p><small>אפרת · יום חמישי · 19.11.2026</small></footer>
