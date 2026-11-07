@@ -1,0 +1,28 @@
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>דשבורד · יום הולדת לאפרת</title>
+<style>
+body{margin:0;font-family:system-ui,'Assistant',sans-serif;background:#f6f1ea;color:#1f3b3a}
+.w{max-width:760px;margin:auto;padding:22px 16px 40px}h1{margin:0 0 4px;color:#1f6f6b;font-size:26px}.sub{color:#8a7a6a;font-size:13px;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:620px){.cards{grid-template-columns:repeat(4,1fr)}}
+.c{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px #0001;text-align:center}.c b{display:block;font-size:34px;color:#e07a3c}.c span{font-size:13px;color:#555}
+.bar{height:12px;border-radius:8px;background:#e8dfd4;overflow:hidden;display:flex;margin:18px 0 6px}.bar i{display:block;height:100%}
+.leg{font-size:12px;color:#666;display:flex;gap:12px;flex-wrap:wrap}.leg em{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:4px;font-style:normal}
+table{width:100%;border-collapse:collapse;margin-top:20px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px #0001;font-size:14px}
+th,td{padding:10px;text-align:right;border-bottom:1px solid #f0e8de}th{background:#1f6f6b;color:#fff;font-weight:600}
+.s{padding:3px 9px;border-radius:20px;font-size:12px;white-space:nowrap}.yes{background:#d6efe9;color:#1f6f6b}.no{background:#f9dccc;color:#a24a1b}.wait{background:#eee;color:#777}
+</style></head><body><div class="w"><h1>🎂 אישורי הגעה לאפרת</h1><div class="sub" id="upd">טוען...</div>
+<div class="cards"><div class="c"><b id="ppl">–</b><span>אנשים מגיעים</span></div><div class="c"><b id="sl">–</b><span>נשארים לישון</span></div><div class="c"><b id="wt">–</b><span>הזמנות בלי תשובה</span></div><div class="c"><b id="no">–</b><span>הזמנות שלא מגיעות</span></div></div>
+<div class="bar" id="bar"></div><div class="leg"><span><em style="background:#1f6f6b"></em>מגיעים</span><span><em style="background:#e07a3c"></em>לא מגיעים</span><span><em style="background:#cfc5b8"></em>ממתינים</span></div>
+<table><thead><tr><th>מוזמנים</th><th>סטטוס</th><th>לינה</th><th>עודכן</th></tr></thead><tbody id="tb"></tbody></table></div>
+<script>
+const KEY=new URLSearchParams(location.search).get('k')||'';const SB='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbm5sZWltcXdnbmdsem53eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyODgwNTUsImV4cCI6MjEwMTg2NDA1NX0.6jATYqxEJ3bxMEuHNDLHpbbB0miVti9YfDR566zKOhY';
+async function load(){try{const r=await fetch('https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rpc/get_dashboard',{method:'POST',headers:{apikey:SB,Authorization:'Bearer '+SB,'Content-Type':'application/json'},body:JSON.stringify({p_key:KEY})});
+if(!r.ok){document.getElementById('upd').textContent='אין גישה. צריך את הקישור המלא.';return}
+const g=await r.json();let ppl=0,sl=0,wt=0,no=0,yes=0;const tb=document.getElementById('tb');tb.innerHTML='';
+for(const x of g){let st,c,n=0;if(!x.attendance){st='ממתין';c='wait';wt++}else if(x.attendance==='not_coming'){st='לא מגיע';c='no';no++}else{yes++;c='yes';if(x.attendance==='couple'){n=2;st='מגיעים שניהם'}else{n=1;st=x.kind==='couple'?'רק אחד/ת':'מגיע/ה'}}
+ppl+=n;if(x.sleeping_over)sl+=n;const t=x.updated_at?new Date(x.updated_at).toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+const tr=document.createElement('tr');[x.name,'',x.attendance&&x.attendance!=='not_coming'?(x.sleeping_over?'כן 🛏️':'לא'):'',t].forEach((v,i)=>{const td=document.createElement('td');if(i===1){const s=document.createElement('span');s.className='s '+c;s.textContent=st;td.appendChild(s)}else td.textContent=v;tr.appendChild(td)});tb.appendChild(tr)}
+for(const[id,v]of[['ppl',ppl],['sl',sl],['wt',wt],['no',no]])document.getElementById(id).textContent=v;
+const T=g.length||1;document.getElementById('bar').innerHTML='<i style="width:'+yes/T*100+'%;background:#1f6f6b"></i><i style="width:'+no/T*100+'%;background:#e07a3c"></i><i style="width:'+wt/T*100+'%;background:#cfc5b8"></i>';
+document.getElementById('upd').textContent=g.length+' הזמנות · מתעדכן לבד · '+new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){document.getElementById('upd').textContent='שגיאת חיבור, מנסה שוב...'}}
+load();setInterval(load,20000);
+</script></body></html>
