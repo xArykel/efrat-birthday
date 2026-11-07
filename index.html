@@ -32,7 +32,7 @@ a{color:inherit;text-underline-offset:5px}button,input{font:inherit}a,button,inp
 <div class="info-row"><span class="icon" aria-hidden="true">◷</span><div><b>חמישי, <time datetime="2026-11-19T19:30:00+02:00">19.11.2026</time></b><p>מתחילים ב־19:30, בלי שעת סיום</p></div></div>
 <div class="info-row"><span class="icon" aria-hidden="true">⌖</span><div><b>הבר הפרטי ב״ביסטרו״</b></div></div>
 <div class="stay"><div class="info-row"><span class="icon" aria-hidden="true">☀</span><div><b>שישי בבוקר — יוצאים לטיול</b><p>אם מזג האוויר יאפשר, נמשיך יחד גם בבוקר.</p></div></div><div class="info-row"><span class="icon" aria-hidden="true">☾</span><div><b>נשארים לישון? בשמחה.</b><p>יש אפשרות לינה למי שצריך — סמנו באישור ההגעה.</p></div></div></div>
-<div class="navigation"><a href="https://waze.com/ul?ll=32.80886,35.73101&navigate=yes" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>ניווט בוויז</a><span style="margin:0 10px;color:#b9ccbc">·</span><a href="https://www.google.com/maps/dir/?api=1&destination=32.80886,35.73101" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>גוגל מפות</a></div></section>
+<div class="navigation"><a href="https://waze.com/ul?ll=32.80700,35.72839&navigate=yes" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>ניווט בוויז</a><span style="margin:0 10px;color:#b9ccbc">·</span><a href="https://www.google.com/maps/dir/?api=1&destination=32.80700,35.72839" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>גוגל מפות</a></div></section>
 <section class="card reveal"><div class="tl">
 <div><time class="time" datetime="2026-11-19T19:30:00+02:00">19:30</time><b>קבלת פנים</b><p>כוסית, שייקים ונשנושים</p></div>
 <div><b>ארוחת ערב</b><div class="menu" aria-label="תפריט"><span>מרק חורפי</span><span>בשר ועוף</span></div></div>
@@ -40,9 +40,9 @@ a{color:inherit;text-underline-offset:5px}button,input{font:inherit}a,button,inp
 <section class="rsvp-card reveal" id="rsvp-section"><p class="kicker">שומרים לכם מקום</p><h2>מגיעים?</h2><p class="rsvp-intro">רק כדי שנדע כמה צלחות וכוסות להכין.</p>
 <form id="rsvp"><div class="field" id="name-field"><label for="name">איך קוראים לכם?</label><input type="text" id="name" name="name" autocomplete="name" required maxlength="100" placeholder="השם שלכם" dir="auto"></div>
 <fieldset><legend>בחירת אישור הגעה</legend><div class="opts">
-<label id="opt-couple"><input type="radio" name="attendance" value="couple" checked required>מגיעים שנינו 🥂</label>
+<label id="opt-couple"><input type="radio" name="attendance" value="couple" checked required>מגיעים 🥂</label>
 <label id="opt-alone"><input type="radio" name="attendance" value="alone"><span>רק אחד/ת מאיתנו יגיע</span></label>
-<label><input type="radio" name="attendance" value="not_coming"><span id="no-text">לא נוכל להגיע, לצערנו</span></label></div></fieldset>
+<label><input type="radio" name="attendance" value="not_coming"><span id="no-text">לא מגיעים, לצערנו</span></label></div></fieldset>
 <label class="sleep"><input type="checkbox" name="sleeping_over" value="yes"><span id="sleep-text">נשארים לישון</span></label>
 <button class="btn" type="submit">שליחת תשובה ←</button><p class="form-foot">אפשר לעדכן את אריאל אם התוכניות משתנות.</p>
 <p class="err" role="alert" hidden>השליחה לא הצליחה. נסו שוב בעוד רגע.</p></form>
@@ -67,7 +67,8 @@ form.addEventListener('change',()=>{const absent=form.elements.attendance.value=
   try{const r=await fetch(RPC+'get_invite',{method:'POST',headers:H,body:JSON.stringify({p_token:token})});const rows=await r.json();if(!r.ok||!rows.length)return invalid();
     const g=rows[0];
     const greeting=document.getElementById('guest-greeting');greeting.textContent='שלום '+g.name+',';greeting.hidden=false;document.getElementById('invitation-line').textContent='חגיגה של פעם בשנה';
-    if(g.kind==='single'){document.getElementById('opt-couple').remove();const a=document.getElementById('opt-alone');a.querySelector('input').required=true;a.querySelector('span').textContent='מגיע/ה 🥂';document.getElementById('no-text').textContent='לא אוכל להגיע, לצערי';document.getElementById('sleep-text').textContent='נשאר/ת לישון';}
+    if(g.kind!=='single'){document.getElementById('opt-alone').remove();}
+    if(g.kind==='single'){document.getElementById('opt-couple').remove();const a=document.getElementById('opt-alone');a.querySelector('input').required=true;a.querySelector('span').textContent='מגיע/ה 🥂';document.getElementById('no-text').textContent='לא מגיע/ה, לצערי';document.getElementById('sleep-text').textContent='נשאר/ת לישון';}
     const def=g.attendance||(g.kind==='single'?'alone':'couple');
     const radio=form.querySelector('input[name=attendance][value="'+def+'"]');if(radio)radio.checked=true;
     form.elements.sleeping_over.checked=!!g.sleeping_over;form.dispatchEvent(new Event('change'));
