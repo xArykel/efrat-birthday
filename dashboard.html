@@ -1,30 +1,33 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>רשימת מוזמנים · אפרת</title>
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>דשבורד · יום הולדת לאפרת</title>
 <style>
 body{margin:0;font-family:system-ui,'Assistant',sans-serif;background:#f6f1ea;color:#1f3b3a}
-.w{max-width:620px;margin:auto;padding:22px 14px 40px}h1{margin:0 0 6px;color:#1f6f6b;font-size:24px}
-.sum{display:flex;gap:8px;margin:12px 0 18px;flex-wrap:wrap}.sum span{background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;box-shadow:0 1px 6px #0001}.sum b{color:#e07a3c}
-.g{background:#fff;border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px #0001}
-.top{display:flex;justify-content:space-between;align-items:center;gap:8px}.n{font-weight:700;font-size:17px}
-.bt{display:flex;gap:6px}.bt button{border:1.5px solid #cfc5b8;background:#fff;border-radius:999px;padding:7px 13px;font-size:14px;cursor:pointer;color:#555}
-.bt button.on.c{background:#1f6f6b;border-color:#1f6f6b;color:#fff}.bt button.on.x{background:#e07a3c;border-color:#e07a3c;color:#fff}
-input{width:100%;box-sizing:border-box;margin-top:10px;border:1px solid #e8dfd4;border-radius:10px;padding:9px 11px;font-size:15px;font-family:inherit;background:#fbf8f4}
-.st{font-size:12px;color:#8a7a6a;margin-top:5px;min-height:14px}
-</style></head><body><div class="w"><h1>🎂 מי מגיע לאפרת</h1>
-<div class="sum"><span>מגיעים: <b id="yes">0</b></span><span>לא מגיעים: <b id="no">0</b></span><span>לא סומן: <b id="wt">0</b></span></div>
-<div id="list">טוען...</div></div>
+.w{max-width:760px;margin:auto;padding:22px 16px 40px}h1{margin:0 0 4px;color:#1f6f6b;font-size:26px}.sub{color:#8a7a6a;font-size:13px;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(min-width:620px){.cards{grid-template-columns:repeat(4,1fr)}}
+.c{background:#fff;border-radius:16px;padding:14px;box-shadow:0 2px 10px #0001;text-align:center}.c b{display:block;font-size:34px;color:#e07a3c}.c span{font-size:13px;color:#555}
+.bar{height:12px;border-radius:8px;background:#e8dfd4;overflow:hidden;display:flex;margin:18px 0 6px}.bar i{display:block;height:100%}
+.leg{font-size:12px;color:#666;display:flex;gap:12px;flex-wrap:wrap}.leg em{display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:4px;font-style:normal}
+table{width:100%;border-collapse:collapse;margin-top:20px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px #0001;font-size:14px}
+th,td{padding:10px;text-align:right;border-bottom:1px solid #f0e8de}th{background:#1f6f6b;color:#fff;font-weight:600}
+.s{padding:3px 9px;border-radius:20px;font-size:12px;white-space:nowrap}.yes{background:#d6efe9;color:#1f6f6b}.no{background:#f9dccc;color:#a24a1b}.wait{background:#eee;color:#777}
+.cp{border:0;background:#e07a3c;color:#fff;border-radius:20px;padding:5px 10px;font-size:12px;cursor:pointer;margin-left:6px}.op{font-size:12px;color:#1f6f6b}.w{overflow-x:auto}.ck{width:20px;height:20px;accent-color:#1f6f6b;cursor:pointer;vertical-align:middle;margin-left:6px}.nt{width:100%;min-width:110px;box-sizing:border-box;border:1px solid #e8dfd4;border-radius:8px;padding:6px 8px;font-size:13px;font-family:inherit;background:#fbf8f4}.nt:focus{outline:2px solid #1f6f6b55}</style></head><body><div class="w"><h1>🎂 אישורי הגעה לאפרת</h1><div class="sub" id="upd">טוען...</div>
+<div class="cards"><div class="c"><b id="ppl">–</b><span>אנשים מגיעים</span></div><div class="c"><b id="sl">–</b><span>נשארים לישון</span></div><div class="c"><b id="wt">–</b><span>הזמנות בלי תשובה</span></div><div class="c"><b id="no">–</b><span>הזמנות שלא מגיעות</span></div></div>
+<div class="bar" id="bar"></div><div class="leg"><span><em style="background:#1f6f6b"></em>מגיעים</span><span><em style="background:#e07a3c"></em>לא מגיעים</span><span><em style="background:#cfc5b8"></em>ממתינים</span></div>
+<table><thead><tr><th>מוזמנים</th><th>מגיעים</th><th>הערה</th><th>לינה</th><th>עודכן</th><th>קישור</th></tr></thead><tbody id="tb"></tbody></table></div>
 <script>
-const KEY=new URLSearchParams(location.search).get('k')||'',SB='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbm5sZWltcXdnbmdsem53eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyODgwNTUsImV4cCI6MjEwMTg2NDA1NX0.6jATYqxEJ3bxMEuHNDLHpbbB0miVti9YfDR566zKOhY',API='https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rpc/';
-const H={apikey:SB,Authorization:'Bearer '+SB,'Content-Type':'application/json'};let rows=[];
-const call=(f,b)=>fetch(API+f,{method:'POST',headers:H,body:JSON.stringify(b)});
-const st=a=>!a?null:(a==='not_coming'?'not_coming':'coming');
-function sum(){let y=0,n=0,w=0;rows.forEach(r=>{const s=st(r.attendance);s==='coming'?y++:s==='not_coming'?n++:w++});yes.textContent=y;no.textContent=n;wt.textContent=w}
-async function save(r,el,msg){msg.textContent='שומר...';const res=await call('admin_mark',{p_key:KEY,p_token:r.token,p_attendance:st(r.attendance),p_note:r.note||''});msg.textContent=res.ok?'נשמר ✓':'שגיאה בשמירה, נסה שוב';sum()}
-function render(){const L=document.getElementById('list');L.innerHTML='';rows.forEach(r=>{
-const d=document.createElement('div');d.className='g';const t=document.createElement('div');t.className='top';const n=document.createElement('div');n.className='n';n.textContent=r.name;
-const bt=document.createElement('div');bt.className='bt';const msg=document.createElement('div');msg.className='st';
-const mk=(label,val,cls)=>{const b=document.createElement('button');b.textContent=label;b.className=cls+(st(r.attendance)===val?' on':'');b.onclick=()=>{const cur=st(r.attendance);r.attendance=cur===val?null:(val==='coming'?'couple':'not_coming');bt.querySelectorAll('button').forEach(x=>x.classList.remove('on'));if(r.attendance)b.classList.add('on');save(r,d,msg)};return b};
-bt.append(mk('מגיעים ✓','coming','c'),mk('לא מגיעים','not_coming','x'));t.append(n,bt);
-const inp=document.createElement('input');inp.placeholder='הערה קצרה...';inp.maxLength=200;inp.value=r.note||'';let tm;inp.oninput=()=>{r.note=inp.value;clearTimeout(tm);msg.textContent='...';tm=setTimeout(()=>save(r,d,msg),800)};
-d.append(t,inp,msg);L.appendChild(d)});sum()}
-(async()=>{const r=await call('get_dashboard',{p_key:KEY});if(!r.ok){list.textContent='אין גישה. צריך את הקישור המלא.';return}rows=await r.json();render()})();
+const KEY=new URLSearchParams(location.search).get('k')||'';const SB='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxnbm5sZWltcXdnbmdsem53eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyODgwNTUsImV4cCI6MjEwMTg2NDA1NX0.6jATYqxEJ3bxMEuHNDLHpbbB0miVti9YfDR566zKOhY';
+let busy=false;async function save(tok,att,note){busy=true;try{await fetch('https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rpc/admin_mark',{method:'POST',headers:{apikey:SB,Authorization:'Bearer '+SB,'Content-Type':'application/json'},body:JSON.stringify({p_key:KEY,p_token:tok,p_attendance:att,p_note:note})})}finally{busy=document.activeElement&&document.activeElement.className==='nt';load(true)}}
+async function load(force){if(busy&&!force)return;try{const r=await fetch('https://lgnnleimqwgnglznwyhp.supabase.co/rest/v1/rpc/get_dashboard',{method:'POST',headers:{apikey:SB,Authorization:'Bearer '+SB,'Content-Type':'application/json'},body:JSON.stringify({p_key:KEY})});
+if(!r.ok){document.getElementById('upd').textContent='אין גישה. צריך את הקישור המלא.';return}
+const g=await r.json();let ppl=0,sl=0,wt=0,no=0,yes=0;const tb=document.getElementById('tb');tb.innerHTML='';
+for(const x of g){let st,c,n=0;if(!x.attendance){st='ממתין';c='wait';wt++}else if(x.attendance==='not_coming'){st='לא מגיע';c='no';no++}else{yes++;c='yes';if(x.attendance==='couple'){n=2;st='מגיעים'}else{n=1;st=x.kind==='couple'?'מגיעים':'מגיע/ה'}}
+ppl+=n;if(x.sleeping_over)sl+=n;const t=x.updated_at?new Date(x.updated_at).toLocaleString('he-IL',{timeZone:'Asia/Jerusalem',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+const tr=document.createElement('tr');const td0=document.createElement('td');td0.textContent=x.name;tr.appendChild(td0);
+const tdc=document.createElement('td');tdc.style.whiteSpace='nowrap';const cb=document.createElement('input');cb.type='checkbox';cb.className='ck';cb.checked=!!x.attendance&&x.attendance!=='not_coming';const s=document.createElement('span');s.className='s '+c;s.textContent=st;
+cb.onchange=()=>save(x.token,cb.checked?'coming':'not_coming',inp.value);tdc.append(cb,s);tr.appendChild(tdc);
+const tdn=document.createElement('td');const inp=document.createElement('input');inp.className='nt';inp.maxLength=200;inp.placeholder='הערה...';inp.value=x.note||'';let tm;inp.oninput=()=>{busy=true;clearTimeout(tm);tm=setTimeout(()=>save(x.token,x.attendance?(x.attendance==='not_coming'?'not_coming':'coming'):null,inp.value),900)};inp.onblur=()=>{busy=false};tdn.appendChild(inp);tr.appendChild(tdn);
+[x.attendance&&x.attendance!=='not_coming'?(x.sleeping_over?'כן 🛏️':'לא'):'',t].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});const L='https://xarykel.github.io/efrat-birthday/?i='+x.token;const td=document.createElement('td');const b=document.createElement('button');b.className='cp';b.textContent='העתק 🔗';b.title=L;b.onclick=()=>{navigator.clipboard.writeText(L).then(()=>{b.textContent='הועתק ✓';setTimeout(()=>b.textContent='העתק 🔗',1500)})};const a=document.createElement('a');a.href=L;a.target='_blank';a.textContent='פתח';a.className='op';td.append(b,a);tr.appendChild(td);tb.appendChild(tr)}
+for(const[id,v]of[['ppl',ppl],['sl',sl],['wt',wt],['no',no]])document.getElementById(id).textContent=v;
+const T=g.length||1;document.getElementById('bar').innerHTML='<i style="width:'+yes/T*100+'%;background:#1f6f6b"></i><i style="width:'+no/T*100+'%;background:#e07a3c"></i><i style="width:'+wt/T*100+'%;background:#cfc5b8"></i>';
+document.getElementById('upd').textContent=g.length+' הזמנות · מתעדכן לבד · '+new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){document.getElementById('upd').textContent='שגיאת חיבור, מנסה שוב...'}}
+load();setInterval(load,20000);
 </script></body></html>
