@@ -17,6 +17,12 @@ th,td{padding:10px;text-align:right;border-bottom:1px solid #f0e8de}th{backgroun
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 8px}@media(max-width:520px){.cards3 .c b{font-size:22px}}
 tr.cat td{background:#eef6f5;color:#1f6f6b;font-weight:600;font-size:13px;padding:7px 10px;border-bottom:1px solid #e0ebe9}
 #shopTbl td:last-child,#shopTbl th:last-child,#sumT,#sumF,#sumD{white-space:nowrap;font-variant-numeric:tabular-nums;direction:ltr}
+.shopHead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:32px}
+.shopHead h2{margin:0}
+.extra{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;background:#fff;border-radius:24px;padding:6px 10px 6px 6px;box-shadow:0 2px 10px #0001;white-space:nowrap}
+.extra button{width:28px;height:28px;border:0;border-radius:50%;background:#1f6f6b;color:#fff;font-size:18px;line-height:1;cursor:pointer}
+.extra button:active{transform:scale(.95)}.extra b{min-width:1.4em;text-align:center;color:#1f3b3a;font-size:16px}
+#shopWho{margin:8px 0 0}
 </style></head><body><div class="w"><h1>🎂 אישורי הגעה לאפרת</h1><div class="sub" id="upd">טוען...</div>
 <div class="cards"><div class="c"><b id="ppl">–</b><span>אנשים מגיעים</span></div><div class="c"><b id="sl">–</b><span>נשארים לישון</span></div><div class="c"><b id="wt">–</b><span>הזמנות בלי תשובה</span></div><div class="c"><b id="no">–</b><span>הזמנות שלא מגיעות</span></div></div>
 <div class="bar" id="bar"></div><div class="leg"><span><em style="background:#1f6f6b"></em>מגיעים</span><span><em style="background:#e07a3c"></em>לא מגיעים</span><span><em style="background:#cfc5b8"></em>ממתינים</span></div>
@@ -45,7 +51,11 @@ tr.cat td{background:#eef6f5;color:#1f6f6b;font-weight:600;font-size:13px;paddin
 <p class="hint">לא הוחלט עדיין: סוג הנתח, מספר צמחונים/טבעונים, מספר שותים.</p>
 </div>
 
-<h2>רשימת קניות ל־15 אורחים</h2>
+<div class="shopHead">
+<h2 id="shopTitle">רשימת קניות</h2>
+<div class="extra"><span>אורחים נוספים צפויים</span><button type="button" id="exMinus" aria-label="פחות">−</button><b id="exVal">0</b><button type="button" id="exPlus" aria-label="יותר">+</button></div>
+</div>
+<p class="hint" id="shopWho"></p>
 <div class="sub">מחירים משוערים, נכון ל־10.11.2026</div>
 <div class="cards3">
 <div class="c"><b id="sumT">–</b><span>סה"כ משוער</span><div class="hint" id="sumNote" style="margin:6px 0 0"></div></div>
@@ -71,73 +81,101 @@ const tdl=document.createElement('td');const sel=document.createElement('select'
 [t].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});const L='https://xarykel.github.io/efrat-birthday/?i='+x.token;const td=document.createElement('td');const b=document.createElement('button');b.className='cp';b.textContent='העתק 🔗';b.title=L;b.onclick=()=>{navigator.clipboard.writeText(L).then(()=>{b.textContent='הועתק ✓';setTimeout(()=>b.textContent='העתק 🔗',1500)})};const a=document.createElement('a');a.href=L;a.target='_blank';a.textContent='פתח';a.className='op';td.append(b,a);tr.appendChild(td);tb.appendChild(tr)}
 for(const[id,v]of[['ppl',ppl],['sl',sl],['wt',wt],['no',no]])document.getElementById(id).textContent=v;
 const T=g.length||1;document.getElementById('bar').innerHTML='<i style="width:'+yes/T*100+'%;background:#1f6f6b"></i><i style="width:'+no/T*100+'%;background:#e07a3c"></i><i style="width:'+wt/T*100+'%;background:#cfc5b8"></i>';
-document.getElementById('upd').textContent=g.length+' הזמנות · מתעדכן לבד · '+new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){document.getElementById('upd').textContent='שגיאת חיבור, מנסה שוב...'}}
+document.getElementById('upd').textContent=g.length+' הזמנות · מתעדכן לבד · '+new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',second:'2-digit'});window.confirmedGuests=ppl;if(window.renderShop)window.renderShop()}catch(e){document.getElementById('upd').textContent='שגיאת חיבור, מנסה שוב...'}}
 load();setInterval(load,20000);
 </script>
 <script>
 const BASE_GUESTS=15;
+const EXTRA_KEY='efratShopExtra';
 const SHOP=[
-{cat:'בשר ועוף',name:'בשר למעשנה',qty:3,unit:'ק"ג',price:360,kind:'food'},
-{cat:'בשר ועוף',name:'עופות גדולים',qty:2,unit:'יח׳',label:'2 יח׳ כ־4 ק"ג',price:96,kind:'food'},
-{cat:'מרק וירקות',name:'עדשים כתומות',qty:1,unit:'ק"ג',price:20,kind:'food'},
-{cat:'מרק וירקות',name:'דלעת',qty:.8,unit:'ק"ג',label:'800 גרם',price:8,kind:'food'},
-{cat:'מרק וירקות',name:'בטטות',qty:1,unit:'ק"ג',price:10,kind:'food'},
-{cat:'מרק וירקות',name:'תפוחי אדמה',qty:2,unit:'ק"ג',price:12,kind:'food'},
-{cat:'מרק וירקות',name:'גזר',qty:1.4,unit:'ק"ג',price:9,kind:'food'},
-{cat:'מרק וירקות',name:'בצל',qty:1,unit:'ק"ג',price:5,kind:'food'},
-{cat:'מרק וירקות',name:'שום',qty:2,unit:'ראשים',price:10,kind:'food'},
-{cat:'מרק וירקות',name:'עגבניות',qty:1,unit:'ק"ג',price:10,kind:'food'},
-{cat:'מרק וירקות',name:'מלפפונים',qty:1,unit:'ק"ג',price:8,kind:'food'},
-{cat:'מרק וירקות',name:'פלפלים',qty:3,unit:'יחידות',price:12,kind:'food'},
-{cat:'מרק וירקות',name:'חסה / עלים מעורבים',qty:2,unit:'שקיות',price:28,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'פטרוזיליה',qty:1,unit:'צרור',label:'צרור',price:5,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'כוסברה',qty:1,unit:'צרור',label:'צרור',price:5,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'נענע',qty:2,unit:'צרורות',price:12,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'רוזמרין',qty:1,unit:'צרור',label:'צרור',price:7,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'טימין',qty:1,unit:'צרור',label:'צרור',price:7,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'לימונים',qty:10,unit:'יח׳',price:16,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'ליים',qty:3,unit:'יח׳',price:12,kind:'food'},
-{cat:'עשבים ופירות הדר',name:'תפוזים',qty:4,unit:'יח׳',price:8,kind:'food'},
-{cat:'לחם ואורז',name:'אורז (אופציונלי)',qty:1,unit:'ק"ג',price:12,kind:'food'},
-{cat:'לחם ואורז',name:'לחם כפרי',qty:3,unit:'כיכרות',price:54,kind:'food'},
-{cat:'מזווה ותבלינים',name:'שמן זית',qty:500,unit:'מ"ל',price:35,kind:'food'},
-{cat:'מזווה ותבלינים',name:'מלח',qty:1,unit:'אריזה',label:'אריזה',price:4,kind:'food'},
-{cat:'מזווה ותבלינים',name:'פלפל שחור',qty:1,unit:'אריזה',label:'אריזה',price:12,kind:'food'},
-{cat:'מזווה ותבלינים',name:'כמון',qty:1,unit:'אריזה',label:'אריזה',price:10,kind:'food'},
-{cat:'מזווה ותבלינים',name:'כורכום',qty:1,unit:'אריזה',label:'אריזה',price:9,kind:'food'},
-{cat:'מזווה ותבלינים',name:'פפריקה',qty:1,unit:'אריזה',label:'אריזה',price:10,kind:'food'},
-{cat:'בר ושתייה',name:'יין אדום ולבן',qty:4,unit:'בקבוקים',price:160,kind:'drink'},
-{cat:'בר ושתייה',name:'בירה',qty:12,unit:'בקבוקים',price:72,kind:'drink'},
-{cat:'בר ושתייה',name:"ג'ין או וודקה",qty:700,unit:'מ"ל',price:85,kind:'drink'},
-{cat:'בר ושתייה',name:'מיץ תפוחים',qty:2,unit:'ליטר',price:22,kind:'drink'},
-{cat:'בר ושתייה',name:'מיץ רימונים',qty:2,unit:'ליטר',price:46,kind:'drink'},
-{cat:'בר ושתייה',name:'סודה',qty:6,unit:'ליטר',price:20,kind:'drink'},
-{cat:'בר ושתייה',name:"ג'ינג'ר אייל",qty:2,unit:'ליטר',price:20,kind:'drink'},
-{cat:'בר ושתייה',name:'סירופ סוכר',qty:500,unit:'מ"ל',price:20,kind:'drink'},
-{cat:'בר ושתייה',name:'קרח',qty:8,unit:'ק"ג',price:50,kind:'drink'},
-{cat:'בר ושתייה',name:'מים מינרליים',qty:15,unit:'ליטר',label:'12–18 ליטר',price:25,kind:'drink'},
-{cat:'בר ושתייה',name:'שתייה קלה נוספת',qty:3.5,unit:'ליטר',label:'3–4 ליטר',price:25,kind:'drink'}
+{cat:'בשר ועוף',name:'בשר למעשנה',qty:3,unit:'ק"ג',price:360,kind:'food',scale:'kg'},
+{cat:'בשר ועוף',name:'עופות גדולים',qty:2,unit:'יח׳',price:96,kind:'food',scale:'unit'},
+{cat:'מרק וירקות',name:'עדשים כתומות',qty:1,unit:'ק"ג',price:20,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'דלעת',qty:.8,unit:'ק"ג',price:8,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'בטטות',qty:1,unit:'ק"ג',price:10,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'תפוחי אדמה',qty:2,unit:'ק"ג',price:12,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'גזר',qty:1.4,unit:'ק"ג',price:9,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'בצל',qty:1,unit:'ק"ג',price:5,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'שום',qty:2,unit:'ראשים',unit1:'ראש',price:10,kind:'food',scale:'unit'},
+{cat:'מרק וירקות',name:'עגבניות',qty:1,unit:'ק"ג',price:10,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'מלפפונים',qty:1,unit:'ק"ג',price:8,kind:'food',scale:'kg'},
+{cat:'מרק וירקות',name:'פלפלים',qty:3,unit:'יחידות',unit1:'יחידה',price:12,kind:'food',scale:'unit'},
+{cat:'מרק וירקות',name:'חסה / עלים מעורבים',qty:2,unit:'שקיות',unit1:'שקית',price:28,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'פטרוזיליה',qty:1,unit:'צרורות',unit1:'צרור',price:5,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'כוסברה',qty:1,unit:'צרורות',unit1:'צרור',price:5,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'נענע',qty:2,unit:'צרורות',unit1:'צרור',price:12,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'רוזמרין',qty:1,unit:'צרורות',unit1:'צרור',price:7,kind:'food',scale:'fixed'},
+{cat:'עשבים ופירות הדר',name:'טימין',qty:1,unit:'צרורות',unit1:'צרור',price:7,kind:'food',scale:'fixed'},
+{cat:'עשבים ופירות הדר',name:'לימונים',qty:10,unit:'יח׳',price:16,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'ליים',qty:3,unit:'יח׳',price:12,kind:'food',scale:'unit'},
+{cat:'עשבים ופירות הדר',name:'תפוזים',qty:4,unit:'יח׳',price:8,kind:'food',scale:'unit'},
+{cat:'לחם ואורז',name:'אורז (אופציונלי)',qty:1,unit:'ק"ג',price:12,kind:'food',scale:'kg'},
+{cat:'לחם ואורז',name:'לחם כפרי',qty:3,unit:'כיכרות',unit1:'כיכר',price:54,kind:'food',scale:'unit'},
+{cat:'מזווה ותבלינים',name:'שמן זית',qty:500,unit:'מ"ל',price:35,kind:'food',scale:'fixed'},
+{cat:'מזווה ותבלינים',name:'מלח',qty:1,unit:'אריזה',price:4,kind:'food',scale:'fixed'},
+{cat:'מזווה ותבלינים',name:'פלפל שחור',qty:1,unit:'אריזה',price:12,kind:'food',scale:'fixed'},
+{cat:'מזווה ותבלינים',name:'כמון',qty:1,unit:'אריזה',price:10,kind:'food',scale:'fixed'},
+{cat:'מזווה ותבלינים',name:'כורכום',qty:1,unit:'אריזה',price:9,kind:'food',scale:'fixed'},
+{cat:'מזווה ותבלינים',name:'פפריקה',qty:1,unit:'אריזה',price:10,kind:'food',scale:'fixed'},
+{cat:'בר ושתייה',name:'יין אדום ולבן',qty:4,unit:'בקבוקים',unit1:'בקבוק',price:160,kind:'drink',scale:'unit'},
+{cat:'בר ושתייה',name:'בירה',qty:12,unit:'בקבוקים',unit1:'בקבוק',price:72,kind:'drink',scale:'unit'},
+{cat:'בר ושתייה',name:"ג'ין או וודקה",qty:700,unit:'מ"ל',price:85,kind:'drink',scale:'spirits'},
+{cat:'בר ושתייה',name:'מיץ תפוחים',qty:2,unit:'ליטר',price:22,kind:'drink',scale:'liter'},
+{cat:'בר ושתייה',name:'מיץ רימונים',qty:2,unit:'ליטר',price:46,kind:'drink',scale:'liter'},
+{cat:'בר ושתייה',name:'סודה',qty:6,unit:'ליטר',price:20,kind:'drink',scale:'liter'},
+{cat:'בר ושתייה',name:"ג'ינג'ר אייל",qty:2,unit:'ליטר',price:20,kind:'drink',scale:'liter'},
+{cat:'בר ושתייה',name:'סירופ סוכר',qty:500,unit:'מ"ל',price:20,kind:'drink',scale:'fixed'},
+{cat:'בר ושתייה',name:'קרח',qty:8,unit:'ק"ג',price:50,kind:'drink',scale:'kg'},
+{cat:'בר ושתייה',name:'מים מינרליים',qty:15,unit:'ליטר',price:25,kind:'drink',scale:'liter'},
+{cat:'בר ושתייה',name:'שתייה קלה נוספת',qty:3.5,unit:'ליטר',price:25,kind:'drink',scale:'liter'}
 ];
 function nis(n){return '₪'+n.toLocaleString('he-IL')}
-function qtyText(x){return x.label||(x.qty+' '+x.unit)}
-(function renderShop(){
-  const guests=BASE_GUESTS; // static for 15 for now; later scale by coming guests
+function extraGuests(){const n=parseInt(localStorage.getItem(EXTRA_KEY)||'0',10);return Number.isFinite(n)&&n>0?Math.min(99,n):0}
+function setExtra(n){n=Math.max(0,Math.min(99,n|0));localStorage.setItem(EXTRA_KEY,String(n));document.getElementById('exVal').textContent=n;renderShop()}
+function scaleQty(x,n){
+  if(x.scale==='fixed')return x.qty;
+  if(x.scale==='spirits')return 700*Math.max(1,Math.ceil(n/25));
+  const raw=x.qty*n/BASE_GUESTS;
+  if(x.scale==='unit')return Math.max(1,Math.ceil(raw-1e-9));
+  return Math.max(.1,Math.round(raw*10)/10);
+}
+function scalePrice(x,q){return Math.round(x.price*q/(x.scale==='spirits'?700:x.qty))}
+function fmtQty(q,x){
+  if(x.scale==='spirits')return q<=700?'700 מ"ל':(q/700)+' × 700 מ"ל';
+  const unit=(x.unit1&&q===1)?x.unit1:x.unit;
+  const n=(Math.round(q*10)%10===0)?String(Math.round(q)):q.toFixed(1);
+  return n+' '+unit;
+}
+function renderShop(){
+  const x=window.confirmedGuests||0;
+  const y=extraGuests();
+  const n=x+2+y;
+  document.getElementById('shopTitle').textContent='רשימת קניות ל־'+n+' אנשים';
+  document.getElementById('shopWho').textContent='מחושב ל־'+n+' אנשים ('+x+' מאושרים + 2 מארחים + '+y+' נוספים)';
+  document.getElementById('exVal').textContent=y;
   let food=0,drink=0,last='';
   const tb=document.querySelector('#shopTbl tbody');
-  for(const x of SHOP){
-    if(x.cat!==last){last=x.cat;const hr=document.createElement('tr');hr.className='cat';const td=document.createElement('td');td.colSpan=3;td.textContent=x.cat;hr.appendChild(td);tb.appendChild(hr)}
+  tb.innerHTML='';
+  for(const it of SHOP){
+    if(it.cat!==last){last=it.cat;const hr=document.createElement('tr');hr.className='cat';const td=document.createElement('td');td.colSpan=3;td.textContent=it.cat;hr.appendChild(td);tb.appendChild(hr)}
+    const q=scaleQty(it,n),p=scalePrice(it,q);
     const tr=document.createElement('tr');
-    const a=document.createElement('td');a.textContent=x.name;
-    const b=document.createElement('td');b.textContent=qtyText(x);
-    const c=document.createElement('td');c.textContent=nis(x.price);
+    const a=document.createElement('td');a.textContent=it.name;
+    const b=document.createElement('td');b.textContent=fmtQty(q,it);
+    const c=document.createElement('td');c.textContent=nis(p);
     tr.append(a,b,c);tb.appendChild(tr);
-    if(x.kind==='food')food+=x.price;else drink+=x.price;
+    if(it.kind==='food')food+=p;else drink+=p;
   }
   const total=food+drink;
   document.getElementById('sumT').textContent=nis(total);
   document.getElementById('sumF').textContent=nis(food);
   document.getElementById('sumD').textContent=nis(drink);
-  document.getElementById('sumNote').innerHTML='כ־<span dir="ltr">'+nis(Math.round(total/guests))+'</span> לאורח';
-})();
+  document.getElementById('sumNote').innerHTML='כ־<span dir="ltr">'+nis(Math.round(total/n))+'</span> לאורח';
+}
+document.getElementById('exMinus').onclick=()=>setExtra(extraGuests()-1);
+document.getElementById('exPlus').onclick=()=>setExtra(extraGuests()+1);
+document.getElementById('exVal').textContent=extraGuests();
+window.renderShop=renderShop;
+renderShop();
 </script>
 </body></html>
