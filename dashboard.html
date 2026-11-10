@@ -16,7 +16,7 @@ th,td{padding:10px;text-align:right;border-bottom:1px solid #f0e8de}th{backgroun
 .hint{color:#8a7a6a;font-size:13px;margin:14px 0 0;line-height:1.45}
 .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 8px}@media(max-width:520px){.cards3 .c b{font-size:22px}}
 tr.cat td{background:#eef6f5;color:#1f6f6b;font-weight:600;font-size:13px;padding:7px 10px;border-bottom:1px solid #e0ebe9}
-#shopTbl td:last-child,#shopTbl th:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+#shopTbl td:last-child,#shopTbl th:last-child,#sumT,#sumF,#sumD{white-space:nowrap;font-variant-numeric:tabular-nums;direction:ltr}
 </style></head><body><div class="w"><h1>🎂 אישורי הגעה לאפרת</h1><div class="sub" id="upd">טוען...</div>
 <div class="cards"><div class="c"><b id="ppl">–</b><span>אנשים מגיעים</span></div><div class="c"><b id="sl">–</b><span>נשארים לישון</span></div><div class="c"><b id="wt">–</b><span>הזמנות בלי תשובה</span></div><div class="c"><b id="no">–</b><span>הזמנות שלא מגיעות</span></div></div>
 <div class="bar" id="bar"></div><div class="leg"><span><em style="background:#1f6f6b"></em>מגיעים</span><span><em style="background:#e07a3c"></em>לא מגיעים</span><span><em style="background:#cfc5b8"></em>ממתינים</span></div>
@@ -24,7 +24,7 @@ tr.cat td{background:#eef6f5;color:#1f6f6b;font-weight:600;font-size:13px;paddin
 <h2>התפריט 🍂🍷</h2>
 <div class="ml">
 <div class="mi"><b>19:30</b>קבלת פנים: קוקטיילים, יין, חמוצים ביתיים ונשנושים.</div>
-<div class="mi"><b>~20:15</b>ארוחה, מזנון חופשי:
+<div class="mi"><b dir="ltr">~20:15</b>ארוחה, מזנון חופשי:
 <ul>
 <li>מרק עדשים כתומות עם ירקות שורש <em>(טבעוני, ציר ירקות)</em></li>
 <li>בשר מעושן מהמעשנה <em>(נתח עדיין לא נבחר)</em></li>
@@ -38,7 +38,7 @@ tr.cat td{background:#eef6f5;color:#1f6f6b;font-weight:600;font-size:13px;paddin
 <div class="mi"><b>קינוח</b>באחריות אמא של אפרת, עם קפה ותה.</div>
 <div class="mi"><b>קוקטיילים</b>כל אחד עם או בלי אלכוהול:
 <ul>
-<li><em>Apple Ginger Fizz:</em> תפוחים, ג'ינג'ר, לימון, סודה, וודקה/ג'ין לבחירה</li>
+<li><span dir="ltr">Apple Ginger Fizz:</span> תפוחים, ג'ינג'ר, לימון, סודה, וודקה/ג'ין לבחירה</li>
 <li>רימונים, רוזמרין ולימון: עם ג'ין לבחירה</li>
 </ul>
 </div>
@@ -137,7 +137,7 @@ function qtyText(x){return x.label||(x.qty+' '+x.unit)}
   document.getElementById('sumT').textContent=nis(total);
   document.getElementById('sumF').textContent=nis(food);
   document.getElementById('sumD').textContent=nis(drink);
-  document.getElementById('sumNote').textContent='כ־'+nis(Math.round(total/guests))+' לאורח';
+  document.getElementById('sumNote').innerHTML='כ־<span dir="ltr">'+nis(Math.round(total/guests))+'</span> לאורח';
 })();
 </script>
 </body></html>
